@@ -1,8 +1,28 @@
+import { likeCard, unLikeCard } from "./api";
+
+const handleCardLike = ({ cardId, buttonElement, counterElement }) => {
+    buttonElement.disabled = true;
+
+    const isLiked = buttonElement.classList.contains('card__like-button_is-active');
+    const apiCall = isLiked ? unLikeCard : likeCard;
+
+    apiCall(cardId)
+        .then(({ likes }) => {
+            buttonElement.classList.toggle('card__like-button_is-active');
+            counterElement.textContent = likes.length;
+            counterElement.classList.toggle('card__like-counter_is-active', likes.length > 0);
+        })
+        .catch((error) => console.error(error))
+        .finally(() => {
+            buttonElement.disabled = false;
+        });
+};
+
 const createCard = ({
     currentUserId,
     template, 
     data, 
-    likeCallBack, 
+    likeCallBack = handleCardLike, 
     deleteCallBack, 
     imageCallBack
 }) => {

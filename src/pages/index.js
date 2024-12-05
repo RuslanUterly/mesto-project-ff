@@ -6,8 +6,6 @@ import {
   getUserInfo,
   updateUserAvatar,
   updateUserInfo,
-  likeCard,
-  unLikeCard,
   createCard as APICreateCard,
   deleteCard,
 } from '../components/api.js';
@@ -72,26 +70,6 @@ const renderLoading = ({ buttonElement, isLoading }) => {
   } else {
     buttonElement.textContent = 'Сохранить';
   }
-};
-
-const handleCardLike = ({ cardId, buttonElement, counterElement }) => {
-  buttonElement.disabled = true;
-
-  const isLiked = buttonElement.classList.contains('card__like-button_is-active');
-
-  const apiCall = isLiked ? unLikeCard : likeCard;
-
-  apiCall(cardId)
-    .then(({ likes }) => {
-      buttonElement.classList.toggle('card__like-button_is-active');
-
-      counterElement.textContent = likes.length;
-      counterElement.classList.toggle('card__like-counter_is-active', likes.length > 0);
-    })
-    .catch((error) => console.error(error))
-    .finally(() => {
-      buttonElement.disabled = false;
-    });
 };
 
 const handleCardDelete = ({ cardId, buttonElement }) => {
@@ -163,7 +141,6 @@ const handleCardFormSubmit = (event) => {
           template: cardTemplate,
           data: cardData,
           deleteCallBack: handleCardDelete,
-          likeCallBack: handleCardLike,
           imageCallBack: handleOpenImageClick,
         })
       );
@@ -181,10 +158,6 @@ const handleCardFormSubmit = (event) => {
         isLoading: false,
       });
     });
-
-  cardForm.reset();
-
-  closeModal(popupCard);
 }
 
 const handleProfileImageFormSubmit = (event) => {
@@ -264,8 +237,6 @@ profileImage.addEventListener('click', handleProfileImageClick);
 
 
 // Вывод карточек
-// initialCards.forEach(data => cardContainer.append(createCard(cardTemplate, data, likeCard, deleteCard, handleOpenImageClick)));
-
 Promise.all([getUserInfo(), getInitialCards()])
   .then(([{ name, about, avatar, ['_id']: currentUserId }, cardsData]) => {
     setProfile({
@@ -281,7 +252,6 @@ Promise.all([getUserInfo(), getInitialCards()])
           template: cardTemplate,
           data: cardData,
           deleteCallBack: handleCardDelete,
-          likeCallBack: handleCardLike,
           imageCallBack: handleOpenImageClick,
         })
       );
